@@ -3,12 +3,12 @@ pi.py
 # 2020 (C) Nikolas A. Wagner
 # License: GNU GPLv3
 
-# Build_002
+# Build_005
 
-                                          -- Purpose --
- Simplify the process of installing and make it as convenient as possible to install builds on Android devices, via Android Debug Bridge
-
-"""
+                   -- Purpose --
+ Stress test CPU for its sigle-threaded performance
+ 
+ """
 
 import os; import sys
 import decimal; import time
