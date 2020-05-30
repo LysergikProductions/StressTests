@@ -5,8 +5,8 @@ pi.py
 
 # Build_002
 
-                                          -- Purpose --
- Simplify the process of installing and make it as convenient as possible to install builds on Android devices, via Android Debug Bridge
+                   -- Purpose --
+ Stress test CPU for its sigle-threaded performance
 
 """
 
