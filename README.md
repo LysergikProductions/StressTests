@@ -1,4 +1,4 @@
 # StressTests
 Single and multi-threaded stress tests for all platforms
 
-There are known issues with the script. Feel free to bug them or fix them in a branch!
+pi.py is a python3 script written for testing single-thread CPU performance using the Chudkovsky method for caluclating Pi.
