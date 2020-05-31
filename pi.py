@@ -3,10 +3,10 @@ pi.py
 # 2020 (C) Nikolas A. Wagner
 # License: GNU GPLv3
 
-# Build_005
+# Build_008
 
                    -- Purpose --
- Stress test CPU for its sigle-threaded performance
+ Stress test CPU for its single-threaded performance
  
  """
 
@@ -14,23 +14,24 @@ import os; import sys
 import decimal; import time
 startTime = time.time()
 txtPi = ""; final_k = 1; its = 1
-decimalArgs = decimalArgs = decimal.Decimal(0)
+decimalArgs = decimal.Decimal(0)
+validArgs = True
 
 def INIT():
-	global decimalArgs
+	global decimalArgs; global validArgs
 	os.system('clear && printf "Initializing..\n"')
 	try:
 		args = int(sys.argv[1]); print(args)
 		decimalArgs = decimal.Decimal(args)
 	except:
 		print("""I can't do that! I need a single number with no extra symbols!\n""")
+		validArgs = False; return
 	finally:
-		if decimalArgs < 1:
+		if decimalArgs < 0:
 			decimalArgs = 1
 		elif decimalArgs > 10000000:
+			print('For the sake of your Terminal, I will limit you to 10 MIL. Edit code to change this if you insist.')
 			decimalArgs = 10000000
-		elif not decimalArgs:
-			print('you need to enter a number!')
 
 INIT()
 
@@ -76,10 +77,15 @@ def compute_pi(n):
 				return ""
 
 def MAIN():
-	result = compute_pi(int(decimalArgs)); print(result)
-	f = open('pi.txt', 'w+'); f.write(txtPi)
+	global validArgs
 
-	uptime = str(getUptime())
-	print("This took {0} seconds\n".format(uptime))
+	if validArgs == True:
+		result = compute_pi(int(decimalArgs)); print(result)
+		f = open('pi.txt', 'w+'); f.write(txtPi)
+
+		uptime = str(getUptime())
+		print("This took {0} seconds\n".format(uptime))
+	else:
+		print('INIT failed; please try again!')
 
 MAIN()
