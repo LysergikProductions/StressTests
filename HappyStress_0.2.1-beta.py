@@ -4,7 +4,7 @@ HappyStress_0.2.1-beta.py
 2020 (C) Nikolas A. Wagner
 License: GNU GPLv3
 
-Build_0023
+Build_0024
 
 					-- Purpose --
 Stress test CPU for its single-threaded performance
@@ -57,7 +57,7 @@ def INIT():
 try: INIT()
 except: EXIT('unexpected error in INIT()..')
 
-scriptName = 'HappyStress_0.2.1-beta.py'; build = 23
+scriptName = 'HappyStress_0.2.1-beta.py'; build = 24
 copyRight = '2020 (C) Nikolas A. Wagner'
 license = 'Distributed with the GNU GPLv3 license'
 py3_version = sp.getoutput('python3 --version')
@@ -71,12 +71,13 @@ scriptTitle = '\_ HappyStress _/'
 
 # script settings are setup so you can simply add/rm new settings to this
 # dictionary, and the menu_userSetup function will handle the changes
+user_settings = None
 defaultSettings = {
 	'printPi': True,
 	'slowMode': True,
 	'Balanced test testCount': 25,
 	'Balanced test digits': 150000,
-	'ALU test testCount': 15,
+	'ALU test testCount': 10,
 	'ALU test digits': 2000000,
 	'Save Location': './HappyStress_results/'
 }
@@ -231,9 +232,9 @@ def run_compute_pi(testName, dgts, testCount, slowMode, printPi):
 	uptime = get_uptime(startTime)
 
 	cw_dir = getcwd()
-	system('mkdir ./HappyStress_results > /dev/null 2>&1 || exit')
+	system('mkdir {} > /dev/null 2>&1 || exit'.format(user_settings['Save Location']))
 
-	f = open('./HappyStress_results/pi_final_{}.txt'.format(dgts), 'w+')
+	f = open('{}pi_final_{}.txt'.format(user_settings['Save Location'], dgts), 'w+')
 	f.write('{}'.format(txtPi)); f.close()
 	system('cd {}'.format(cw_dir))
 
@@ -341,8 +342,7 @@ def avg_list(this_list):
 		except: print("\n'item' cannot be coverted to type 'decimal'\n")
 		summed += item
 
-	avg = summed / decimal.Decimal(len(this_list))
-	return avg
+	return summed / decimal.Decimal(len(this_list))
 
 def mult(x, n):
 	z = x
@@ -364,13 +364,13 @@ def menu_main():
 
 	print("Press enter to begin or enter 's' to change settings! ", end='')
 	r = input()
-	print('\033[F\033[K', end='')
+	print('\033[F\033[K', end='\r')
 
 	if r == 's':
 		menu_userSetup()
 
 def menu_userSetup():
-	global user_settings
+	global user_settings, defaultSettings
 	selection = None; selected_key = None
 
 	if user_settings is None:
@@ -380,15 +380,30 @@ def menu_userSetup():
 
 	COLS = get_terminal_size().columns
 	print('\n', 'Current Settings:'.center(COLS))
+	print('0. GO BACK'.center(COLS), '\n', end='')
 
 	z = 0
 	for setting in user_settings:
-		# print('{}. {}: {}'.center(COLS - (COLS // 50)).format(z, setting, user_settings[setting]), end='\r')
-		print('{}. {}: {}'.center(COLS - ((len(setting) + len(str(user_settings[setting]))) // 2)).format(z, setting, user_settings[setting]), end='\r')
 		z += 1
 
-	print("\n Enter '-1' to return\n", 'Which setting would you like to set?'.center(COLS), end='')
-	try: selection = int(input('{}'.format(' ' * (COLS // 2))))
+		if z % 2 != 0 and z > 2:
+			print('-'.center(COLS))
+
+		print('{}. {}: {}'
+			.center(
+				COLS - ((len(setting) +
+				len(str(user_settings[setting]))) // 2)
+			)
+\
+			.format(
+				z, setting, user_settings[setting]
+			),
+			end='\r'
+		)
+		
+
+	print('\n\n', 'Which setting would you like to set?'.center(COLS), end='')
+	try: selection = int(input('{}'.format(' ' * (COLS // 2)))) - 1
 	except KeyboardInterrupt: EXIT('Detected KeyboardInterrupt..')
 	except:
 		print('\n', 'Oops. That input is invalid!'.center(COLS))
@@ -405,31 +420,50 @@ def menu_userSetup():
 
 	if selection == -1:
 		MAIN(); exit()
+	elif selection == -2:
+		user_settings = defaultSettings
+		print('\n', 'Settings reverted to defaults!'.center(COLS))
+		t.sleep(1)
+		menu_userSetup(); return 1
 	elif selection < -1:
 		print('\n', 'That is not an available option!'.center(COLS))
+
 		t.sleep(1.5)
 		menu_userSetup(); return 1
 
 	refresh_UI('\_ Test Setup _/', py3_version, bash_version, True)
-
 	COLS = get_terminal_size().columns
-	print('\n', 'Ok, {} selected!'.center(COLS - (COLS // 50)).format(selected_key))
-	print('Type in your new setting:'.center(COLS))
+
+	print(
+		'\n', 'Ok, {} selected!'
+		.center(COLS - (COLS // 50))
+		.format(selected_key),
+\
+		'\n', 'Type in your new setting:'
+		.center(COLS)
+	)
+
 	new_set = input('{}'.format(' ' * (COLS // 2)))
 
-	if new_set.find('true') and new_set.find('t') != -1:
+	if new_set.find('true') != -1 or new_set == 't':
 		new_set = True
-	elif new_set.find('false') and new_set.find('f') != -1:
+	elif new_set.find('false') != -1 or new_set == 'f':
 		new_set = False
 
 	if new_set is not None or '':
 		user_settings[selected_key] = new_set
-		print('\n', '{} has been set to {}!'.center(COLS - (COLS // 50)).format(selected_key, new_set))
+
+		print(
+			'\n', '{} has been set to {}!'
+			.center(COLS - (COLS // 50))
+			.format(selected_key, new_set)
+		)
+
 		t.sleep(1.5)
 	else:
 		print('\n', 'Oops. That input is invalid!'.center(COLS))
 		t.sleep(1.5)
-		menu_userSetup()
+		menu_userSetup(); return 1
 
 	refresh_UI('\_ Test Setup _/', py3_version, bash_version, True)
 	COLS = get_terminal_size().columns
@@ -438,8 +472,22 @@ def menu_userSetup():
 
 	z = 0
 	for setting in user_settings:
-		print('{}. {}: {}'.center(COLS - (COLS // 50)).format(z, setting, user_settings[setting]), end='\r')
 		z += 1
+
+		if z % 2 != 0 and z > 2:
+			print('-'.center(COLS))
+
+		print('{}. {}: {}'
+			.center(
+				COLS - ((len(setting) +
+				len(str(user_settings[setting]))) // 2)
+			)
+\
+			.format(
+				z, setting, user_settings[setting]
+			),
+			end='\r'
+		)
 
 	menu_userSetup(); return
 
