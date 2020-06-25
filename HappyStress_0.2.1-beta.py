@@ -4,7 +4,7 @@ HappyStress_0.2.1-beta.py
 2020 (C) Nikolas A. Wagner
 License: GNU GPLv3
 
-Build_0024
+Build_0025
 
 					-- Purpose --
 Stress test CPU for its single-threaded performance
@@ -21,29 +21,36 @@ import time as t
 start_time_INIT = t.process_time()
 
 import subprocess as sp
-from os import system, get_terminal_size, getcwd
+from os import system, get_terminal_size, path, getcwd
 
 system('clear && printf "Initializing..\n\n"')
 t.sleep(0.5)
 
 try: import pyfiglet
 except ImportError as err:
-	print('{}\n\nLet me just install that for you quick quick :D'.format(err))
-	t.sleep(2)
+	print(
+		'{}\n\nLet me just install that for you quick quick :D'
+		.format(err)
+	); t.sleep(2)
 
 	system('pip3 install pyfiglet==0.7')
-	try: import pyfiglet
-	except Exception as fatalErr: print(fatalErr)
-except Exception as fatalErr: print(fatalErr)
+	try:
+		import pyfiglet
+	except Exception as fatalErr:
+		print(fatalErr)
+except Exception as fatalErr:
+	print(fatalErr)
 
 def EXIT(reason):
 	global start_time_INIT
+
 	exit_time = get_uptime(start_time_INIT)
 
 	print('\n\n\nFinal Script Uptime: {}'.format(exit_time))
 	print('\n\n{}\nGoodbye!\n'.format(reason))
 
 	system('pkill python; pkill python3; history -c')
+
 	if __name__ == '__main__':
 		exit()
 
@@ -57,11 +64,15 @@ def INIT():
 try: INIT()
 except: EXIT('unexpected error in INIT()..')
 
-scriptName = 'HappyStress_0.2.1-beta.py'; build = 24
+build = 25
+scriptName = path.basename(__file__)
 copyRight = '2020 (C) Nikolas A. Wagner'
 license = 'Distributed with the GNU GPLv3 license'
+
 py3_version = sp.getoutput('python3 --version')
-bash_version = sp.getoutput('bash --version | grep version | grep bash')
+bash_version = sp.getoutput(
+	'bash --version | grep version | grep bash'
+)
 
 times = []; file_data = ''; txtPi = ''
 final_k = 1; loop_n = 0; n = 0
@@ -90,39 +101,38 @@ def MAIN():
 
 	menu_main()
 
-	print('\r\033[KMAIN(): Initialization complete!', end='')
-	print('\r\033[KMAIN(): Starting ALU_Spike test..', end='')
-	t.sleep(1)
+	print(
+		'\r\033[KMAIN(): Initialization complete!',
+		'\r\033[KMAIN(): Starting ALU_Spike test..',
+		end=''
+	); t.sleep(1)
+
 	spiked_test(
-		'ALU_Spike',
-		'alu-spike_pre',
-		54353459,
-		834534534,
-		426880,
-		10005,
-		5000000
+		'ALU_Spike', 'alu-spike_pre',
+		54353459, 834534534,
+		426880, 10005, 5000000
 	)
 
 	refresh_UI(scriptTitle, py3_version, bash_version, True)
 
-	print('\n', '\r\033[KMAIN(): Starting memory access time test..', end='')
-	t.sleep(1); times = []
+	print('\n',
+		'\r\033[KMAIN(): Starting memory access time test..',
+		end=''
+	); t.sleep(1); times = []
+
 	looped_test(
-		'memory access',
-		'mem',
-		2000,
-		42,
-		False,
-		False
+		'memory access', 'mem',
+		2000, 42,
+		False, False
 	)
 
 	refresh_UI(scriptTitle, py3_version, bash_version, True)
 
 	print('\r\033[KMAIN(): Starting balanced test..', end='')
 	t.sleep(1); times = []
+
 	looped_test(
-		'balanced',
-		'bal',
+		'balanced', 'bal',
 		user_settings['Balanced test testCount'],
 		user_settings['Balanced test digits'],
 		user_settings['slowMode'],
@@ -132,10 +142,10 @@ def MAIN():
 	refresh_UI(scriptTitle, py3_version, bash_version, True)
 
 	print('\r\033[KMAIN(): Starting ALU test..', end='')
-	times = []
+	t.sleep(1); times = []
+
 	looped_test(
-		'ALU',
-		'alu',
+		'ALU', 'alu',
 		user_settings['ALU test testCount'],
 		user_settings['ALU test digits'],
 		user_settings['slowMode'],
@@ -145,19 +155,15 @@ def MAIN():
 	refresh_UI(scriptTitle, py3_version, bash_version, True)
 
 	print('\r\033[KMAIN(): Starting ALU_Spike test..', end='')
-	times = []
+	t.sleep(1); times = []
+
 	spiked_test(
-		'ALU_Spike',
-		'alu-spike_post',
-		54353459,
-		834534534,
-		426880,
-		10005,
-		5000000
+		'ALU_Spike', 'alu-spike_post',
+		54353459, 834534534,
+		426880, 10005, 5000000
 	)
 
-	time_since_INIT = get_uptime(start_time_INIT)
-	return time_since_INIT
+	return get_uptime(start_time_INIT)
 
 # ---------------------------------------------------------------------
 # core functions
@@ -193,10 +199,16 @@ def compute_pi(testName, dgts, testCount, slowMode, printPi):
 		txtPi = pi
 		
 		if printPi is True:
-			print('\r\033[K{}\n\nRunning {} test {} of {}'.format(pi, testName, loop_n + 1, testCount))
+			print(
+				'\r\033[K{}\n\nRunning {} test {} of {}'
+				.format(pi, testName, loop_n + 1, testCount)
+			)
 		else:
 			system('clear')
-			print('\r\033[K\n\nRunning {} test {} of {}'.format(testName, loop_n + 1, testCount))
+			print(
+				'\r\033[K\n\nRunning {} test {} of {}'
+				.format(testName, loop_n + 1, testCount)
+			)
 
 		if x == 0 and slowMode is True:
 			uptime = get_uptime(start_time_INIT)
@@ -217,8 +229,10 @@ def compute_pi(testName, dgts, testCount, slowMode, printPi):
 					print('\n{}'.format(pi))
 
 				if slowMode is True:
-					print("\ncompute_pi(): {} digits of precision achieved in {} iterations!".format(dgts - 1, final_k))
-					t.sleep(1)
+					print(
+						"\ncompute_pi(): {} digits of precision achieved in {} iterations!"
+						.format(dgts - 1, final_k)
+					); t.sleep(1)
 
 				system('history -c')
 				return pi
@@ -230,11 +244,16 @@ def run_compute_pi(testName, dgts, testCount, slowMode, printPi):
 	startTime = t.process_time()
 	result = compute_pi(testName, int(dgts), testCount, slowMode, printPi, )
 	uptime = get_uptime(startTime)
-
 	cw_dir = getcwd()
-	system('mkdir {} > /dev/null 2>&1 || exit'.format(user_settings['Save Location']))
 
-	f = open('{}pi_final_{}.txt'.format(user_settings['Save Location'], dgts), 'w+')
+	if user_settings is None:
+		saveLoc = defaultSettings['Save Location']
+	else:
+		saveLoc = user_settings['Save Location']
+
+	system('mkdir {} > /dev/null 2>&1 || exit'.format(saveLoc))
+
+	f = open('{}pi_final_{}.txt'.format(saveLoc, dgts), 'w+')
 	f.write('{}'.format(txtPi)); f.close()
 	system('cd {}'.format(cw_dir))
 
@@ -250,17 +269,28 @@ def run_compute_pi(testName, dgts, testCount, slowMode, printPi):
 
 def looped_test(testName, tag, testCount, dgts, slowMode, printPi):
 	global times, loop_n
-	print('Initializing {} test 1 of {}..'.format(testName, testCount), end='')
+
+	print('Initializing {} test 1 of {}..'
+		.format(testName, testCount),
+		end=''
+	)
 
 	start_time_looped = t.process_time()
 	avg_time = decimal.Decimal(0)
 
 	for n in range(testCount):
 		loop_n = n
-		times.append(run_compute_pi(testName, dgts, testCount, slowMode, printPi)) #run_compute_pi() returns uptime of pi calculation
+		times.append(
+			run_compute_pi(
+				testName, dgts, testCount, slowMode, printPi
+			)
+		)
 		
 		if n < testCount - 1 and slowMode is True:
-			print('\rInitializing {} test {} of {}'.format(testName, loop_n + 2, testCount), end='')
+			print('\rInitializing {} test {} of {}'
+				.format(testName, loop_n + 2, testCount),
+				end=''
+			)
 	
 	test_time = get_uptime(start_time_looped)
 	avg_time = round(avg_list(times), 5)
@@ -275,8 +305,9 @@ def looped_test(testName, tag, testCount, dgts, slowMode, printPi):
 		print('2.. ', end=''); t.sleep(1)
 		print('1.. ', end=''); t.sleep(1)
 
-	store_loop_results(tag, test_time, times, avg_time, testCount, dgts)
-	print()
+	store_loop_results(
+		tag, test_time, times, avg_time, testCount, dgts
+	); print()
 
 def spiked_test(testName, tag, x, y, n, sqrt, prec):
 	start_time_mult = t.process_time()
@@ -285,21 +316,41 @@ def spiked_test(testName, tag, x, y, n, sqrt, prec):
 
 	result_mult = mult(x, y)
 	test_time = get_uptime(start_time_mult)
-	print('\r\033[KCalculated {} in {} seconds!\n'.format(result_mult, test_time))
+
+	print('\r\033[KCalculated {} in {} seconds!\n'
+		.format(result_mult, test_time)
+	)
 
 	#print_spike_results()
-	store_spike_results('{}.mult'.format(tag), 'Single repeated-addition test', test_time, x, '*', y, result_mult)
+	store_spike_results(
+		'{}.mult'.format(tag),
+		'Single repeated-addition test',
+		test_time, x, '*', y, result_mult
+	)
 
 	if n and sqrt is not None:
 		start_time_div = t.process_time()
-		print('\r\033[KCalculating {} / sqrt of {} (prec = {})'.format(n, sqrt, prec), end='')
+
+		print(
+			'\r\033[KCalculating {} / sqrt of {} (prec = {})'
+			.format(n, sqrt, prec),
+			end=''
+		)
 
 		result_div = div(n, sqrt, prec)
 		test_time = get_uptime(start_time_div)
-		print('\nCalculated the division in {} seconds!\n'.format(test_time))
+
+		print('\nCalculated the division in {} seconds!\n'
+			.format(test_time)
+		)
 
 		#print_spike_results()
-		store_spike_results('{}.div'.format(tag), 'High-precision square root test', test_time, x, '/ sqrt of {}'.format(sqrt), y, result_div)
+		store_spike_results(
+			'{}.div'.format(tag),
+			'High-precision square root test',
+			test_time, x, '/ sqrt of {}'.format(sqrt),
+			y, result_div
+		)
 
 def threaded(testName, tag, testCount):
 # 	import threading
@@ -323,7 +374,12 @@ def refresh_UI(scriptTitle, info1, info2, clearScreen):
 		system('clear')
 
 	COLS = get_terminal_size().columns
-	t = pyfiglet.Figlet(font='big', width=COLS, justify='center')
+
+	t = pyfiglet.Figlet(
+		font='big',
+		width=COLS,
+		justify='center'
+	)
 
 	print('{} | Build {}'.format(scriptName, str(build)))
 	print('{}\n{}'.format(copyRight, '-' * 32))
@@ -360,6 +416,8 @@ def div(n, sqrt, prec):
 # ---------------------------------------------------------------------
 # menu functions
 def menu_main():
+	global user_settings
+
 	refresh_UI(scriptTitle, py3_version, bash_version, True)
 
 	print("Press enter to begin or enter 's' to change settings! ", end='')
@@ -368,6 +426,8 @@ def menu_main():
 
 	if r == 's':
 		menu_userSetup()
+	else:
+		user_settings = defaultSettings
 
 def menu_userSetup():
 	global user_settings, defaultSettings
@@ -391,8 +451,12 @@ def menu_userSetup():
 
 		print('{}. {}: {}'
 			.center(
-				COLS - ((len(setting) +
-				len(str(user_settings[setting]))) // 2)
+				COLS - ((
+					len(setting) +
+					len(str(
+						user_settings[setting]
+					))
+				) // 2)
 			)
 \
 			.format(
@@ -400,19 +464,29 @@ def menu_userSetup():
 			),
 			end='\r'
 		)
-		
 
-	print('\n\n', 'Which setting would you like to set?'.center(COLS), end='')
-	try: selection = int(input('{}'.format(' ' * (COLS // 2)))) - 1
-	except KeyboardInterrupt: EXIT('Detected KeyboardInterrupt..')
+	print('\n\n',
+		'Which setting would you like to set?'
+		.center(COLS),
+		end=''
+	)
+
+	try:
+		selection = int(
+			input('{}'.format(' ' * (COLS // 2)))
+		) - 1
+	except KeyboardInterrupt:
+		EXIT('Detected KeyboardInterrupt..')
 	except:
 		print('\n', 'Oops. That input is invalid!'.center(COLS))
 		t.sleep(1.5)
 		menu_userSetup(); return 1
 
 	# the tuple function is used to return the key string according to its unordered index
-	try: selected_key = tuple(user_settings.items())[selection][0]
-	except KeyboardInterrupt: EXIT('Detected KeyboardInterrupt..')
+	try:
+		selected_key = tuple(user_settings.items())[selection][0]
+	except KeyboardInterrupt:
+		EXIT('Detected KeyboardInterrupt..')
 	except:
 		print('\n', 'That is not an available option!'.center(COLS))
 		t.sleep(1.5)
@@ -500,9 +574,21 @@ def print_loop_results(totTime, testTimes, avgTime, testCount, dgts):
 	script_time = get_uptime(start_time_INIT)
 
 	print('\n\nRESULTS:\n{}'.format('-' * 7))
+
 	result = 'Script Uptime: {}\n'.format(script_time)
-	result += str(print('Tests performed: {}\nTotal elapsed time: {} seconds\n'.format(testCount, round(totTime, 5))))
-	result += str(print('This computer takes {} seconds on average to calculate {} digits of pi!\n'.format(avgTime, dgts)))
+	result += str(
+		print(
+			'Tests performed: {}\nTotal elapsed time: {} seconds\n'
+			.format(testCount, round(totTime, 5))
+		)
+	)
+	result += str(
+		print(
+			'This computer takes {} seconds on average' +
+			'to calculate {} digits of pi!\n'
+			.format(avgTime, dgts)
+		)
+	)
 	result += str(print('\nTest Times:\n{}'.format('-' * 12)))
 
 	z = 1
@@ -528,8 +614,18 @@ def print_spike_results(tag, desc, totTime, x, sym, y, result):
 
 	print('\n\nRESULTS:\n{}'.format('-' * 7))
 	result += 'Script Uptime: {}\n'.format(script_time)
-	result = str(print('Tests performed: {}\nTotal elapsed time: {} seconds\n'.format(testCount, round(totTime, 5))))
-	result += str(print('This computer takes {} seconds on average to calculate {} digits of pi!\n'.format(avgTime, dgts)))
+	result = str(
+		print(
+			'Tests performed: {}\nTotal elapsed time: {} seconds\n'
+			.format(testCount, round(totTime, 5))
+		)
+	)
+	result += str(
+		print(
+			'This computer takes {} seconds on average to calculate {} digits of pi!\n'
+			.format(avgTime, dgts)
+		)
+	)
 	result += str(print('\nTest Times:\n{}'.format('-' * 12)))
 
 	z = 1
@@ -606,16 +702,17 @@ def store_spike_results(tag, desc, totTime, x, sym, y, result):
 # ---------------------------------------------------------------------
 # try running MAIN, catch exceptions, finally exit()
 print('script: functions are all defined. try-catching MAIN()..\n\n')
-try:
-	upTime = MAIN()
+
+try: upTime = MAIN()		
+except KeyboardInterrupt:
+	EXIT('Detected KeyboardInterrupt..')
+except NameError as error:
+	EXIT('Detected NameError\n\n{}..'.format(error))
+else:
 	if upTime:
 		EXIT('Thanks for using HappyStress!')
 	else:
-		EXIT('unexpected error in MAIN()..')		
-except KeyboardInterrupt:
-	EXIT('Detected KeyboardInterrupt..')
-#except NameError as error:
-	EXIT('Detected NameError\n\n{}..'.format(error))
+		EXIT('unexpected error in MAIN()..')
 
 if __name__ == '__main__':
 	exit()
