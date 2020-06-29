@@ -1,30 +1,26 @@
 #!/usr/bin/python3
 """
-HappyStress_0.4.2-beta.py
+HappyStress_0.2.1-beta.py
 2020 (C) Nikolas A. Wagner
 License: GNU GPLv3
 
-Build_0027
+Build_0030
 
 	-- Purpose --
 Stress test CPU for its single-threaded performance
  
 """
 # ---------------------------------------------------------------------
-# if this is the last thing you see in your terminal after a crash, then
-# SOMETHING IS VERY WRONG 0_o
 print('Compiled without errors! Binary has been executed..')
 # ---------------------------------------------------------------------
-# get script process start time
-import decimal, threading
 import time as t
 start_time_INIT = t.process_time()
 
+import decimal, threading
 import subprocess as sp
 from os import system, get_terminal_size, path, getcwd
 
 system('clear && printf "Initializing..\n\n"')
-#t.sleep(0.5)
 
 try: import pyfiglet
 except ImportError as err:
@@ -41,7 +37,6 @@ except ImportError as err:
 	try: import pyfiglet
 	except Exception as fatalErr:
 		print(fatalErr)
-
 except Exception as fatalErr:
 	print(fatalErr)
 
@@ -54,9 +49,7 @@ def EXIT(reason):
 	print('\n\n{}\nGoodbye!\n'.format(reason))
 
 	system('pkill python; pkill python3; history -c')
-
-	if __name__ == '__main__':
-		exit()
+	exit()
 
 def INIT():
 	global C
@@ -68,7 +61,7 @@ def INIT():
 try: INIT()
 except: EXIT('unexpected error in INIT()..')
 
-build = 27
+build = 30
 scriptName = path.basename(__file__)
 copyRight = '2020 (C) Nikolas A. Wagner'
 license = 'Distributed with the GNU GPLv3 license'
@@ -103,7 +96,7 @@ frozenSettings = frozenset(
 )
 
 # ---------------------------------------------------------------------
-# defining all remaining functions
+# MAIN function
 print('script: defining functions..')
 def MAIN():
 	global times, user_settings
@@ -207,7 +200,7 @@ def compute_pi(testName, dgts, testCount, slowMode, printPi):
 		S += decimal.Decimal(M * L) / X
 		print('\r\033[Krecalculating Pi...', end='')
 		pi = decimal.Decimal(C / S)
-		txtPi = pi
+		txtPi = str(pi)
 		
 		if printPi is True:
 			print(
@@ -221,7 +214,7 @@ def compute_pi(testName, dgts, testCount, slowMode, printPi):
 				.format(testName, loop_n + 1, testCount)
 			)
 
-		if x == 0 and slowMode is True:
+		if slowMode is True:
 			uptime = get_uptime(start_time_INIT)
 			print('\nScript Uptime: {}'.format(uptime))
 			print('calculating k = {}...\n'.format(k))
@@ -250,12 +243,12 @@ def compute_pi(testName, dgts, testCount, slowMode, printPi):
 
 def run_compute_pi(testName, dgts, testCount, slowMode, printPi):
 	global loop_n
+	cw_dir = getcwd()
 
 	# get process start time for the test
 	startTime = t.process_time()
-	result = compute_pi(testName, int(dgts), testCount, slowMode, printPi, )
+	result = compute_pi(testName, int(dgts), testCount, slowMode, printPi)
 	uptime = get_uptime(startTime)
-	cw_dir = getcwd()
 
 	if user_settings is None:
 		saveLoc = str(defaultSettings['Save Location'])
@@ -286,6 +279,7 @@ def looped_test(testName, tag, testCount, dgts, slowMode, printPi):
 		end=''
 	)
 
+	start_time_looped = t.process_time()
 	for n in range(testCount):
 		loop_n = n
 		times.append(
@@ -293,23 +287,25 @@ def looped_test(testName, tag, testCount, dgts, slowMode, printPi):
 				testName, dgts, testCount, slowMode, printPi
 			)
 		)
-		
+
 		if n < testCount - 1 and slowMode is True:
 			print('\rInitializing {} test {} of {}'
 				.format(testName, loop_n + 2, testCount),
 				end=''
 			)
-	
-	test_time = 0
+
+	test_time = get_uptime(start_time_looped)
+
+	process_time = 0
 	for time in times:
-		test_time += time
+		process_time += time
 
 	avg_time = decimal.Decimal(0)
 	avg_time = round(avg_list(times), 5)
 	
 	if slowMode is True:
 		results = print_loop_results(
-			test_time, times, avg_time, testCount, dgts
+			test_time, times, str(avg_time), testCount, dgts
 		)
 		print()
 		print('5.. ', end=''); t.sleep(1)
@@ -553,7 +549,11 @@ def menu_userSetup():
 	new_set = input('{}'.format(' ' * (COLS // 2)))
 
 	if selected_key == 'Save Location' and new_set[-1] != '/':
-		new_set += '/'
+		if new_set[-1] == ' ':
+			new_set = new_set[:-1:1]
+			new_set += '/'
+		else:
+			new_set += '/'
 
 	if new_set.find('true') != -1 or new_set == 't':
 		new_set = True
@@ -615,7 +615,7 @@ def live_Uptime():
 liveUptime = threading.Thread(target=live_Uptime)
 
 # ---------------------------------------------------------------------
-# other impure functions
+# impure functions
 def print_loop_results(totTime, testTimes, avgTime, testCount, dgts):
 	global start_time_INIT
 	script_time = get_uptime(start_time_INIT)
@@ -695,12 +695,17 @@ def print_spike_results(tag, desc, totTime, x, sym, y, result):
 def store_loop_results(tag, totTime, testTimes, avgTime, testCount, dgts):
 	global start_time_INIT
 	script_time = get_uptime(start_time_INIT)
-
 	cw_dir = getcwd()
-	system('mkdir ./HappyStress_results > /dev/null 2>&1 || exit')
+
+	if user_settings is None:
+		saveLoc = str(defaultSettings['Save Location'])
+	else:
+		saveLoc = str(user_settings['Save Location'])
+
+	system('mkdir {} > /dev/null 2>&1 || exit'.format(saveLoc))
 
 	fID = str(int(t.process_time()))
-	f = open('./HappyStress_results/piStress_{}_{}.txt'.format(tag, fID[:-6:-1]), 'w+')
+	f = open('{}piStress_{}_{}.txt'.format(saveLoc, tag, fID[:-6:-1]), 'w+')
 	f.write('Script Uptime: {}\n'.format(script_time))
 	f.write('Tests Performed: {}\n'.format(testCount))
 	f.write('Pi Digits (calculated per test): {}\n\n'.format(dgts))
@@ -730,12 +735,17 @@ def store_loop_results(tag, totTime, testTimes, avgTime, testCount, dgts):
 def store_spike_results(tag, desc, totTime, x, sym, y, result):
 	global start_time_INIT
 	script_time = get_uptime(start_time_INIT)
-
 	cw_dir = getcwd()
-	system('mkdir ./HappyStress_results > /dev/null 2>&1 || exit')
+
+	if user_settings is None:
+		saveLoc = str(defaultSettings['Save Location'])
+	else:
+		saveLoc = str(user_settings['Save Location'])
+
+	system('mkdir {} > /dev/null 2>&1 || exit'.format(saveLoc))
 
 	fID = str(int(t.process_time()))
-	f = open('./HappyStress_results/piStress_{}_{}.txt'.format(tag, fID[:-6:-1]), 'w+')
+	f = open('{}piStress_{}_{}.txt'.format(saveLoc, tag, fID[:-6:-1]), 'w+')
 	f.write('Script Uptime: {}\nTest Time (total): {}\n'.format(script_time, totTime))
 	f.write('{}\n\n'.format(desc))
 
@@ -756,7 +766,7 @@ except KeyboardInterrupt:
 except NameError as error:
 	EXIT('Detected NameError\n\n{}..'.format(error))
 else:
-	if upTime:
+	if upTime is not False:
 		EXIT('Thanks for using HappyStress!')
 	else:
 		EXIT('unexpected error in MAIN()..')
